@@ -18,13 +18,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
+    StringBuilder urlBuilder;
 
     RecyclerView recyclerView;
     AstroAdapter adapter;
-    private static final String rssUrl = "http://apis.data.go.kr/B090041/openapi/service/AstroEventInfoService/getAstroEventInfo?serviceKey=Syu%2BtqGals35ZDKELPRhuQ0knXp0t%2FUZlA%2FBUGs3GvEfWohCs%2F0pzrHpjN%2B5WOS41N7bbVuPb7o6Xw1wsl%2B%2FPw%3D%3D&solYear=2017&solMonth=09";
     ArrayList<AstroItem> items=new ArrayList<>();
 
     @Override
@@ -35,6 +38,24 @@ public class MainActivity extends AppCompatActivity {
         recyclerView=findViewById(R.id.recycler);
         adapter=new AstroAdapter(items,this);
         recyclerView.setAdapter(adapter);
+        urlBuilder = new StringBuilder("http://apis.data.go.kr/B090041/openapi/service/AstroEventInfoService/getAstroEventInfo");
+
+        Date thisMonth=new Date();
+        SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy/MM//DD");
+        String date=dateFormat.format(thisMonth);
+        String[] formattedDate=date.split("/");
+        String year=formattedDate[0];
+        String month=formattedDate[1];
+        String day=formattedDate[2];
+
+        try{
+            urlBuilder.append("?" + URLEncoder.encode("ServiceKey","UTF-8") + "=Syu%2BtqGals35ZDKELPRhuQ0knXp0t%2FUZlA%2FBUGs3GvEfWohCs%2F0pzrHpjN%2B5WOS41N7bbVuPb7o6Xw1wsl%2B%2FPw%3D%3D");
+            urlBuilder.append("&" + URLEncoder.encode("solYear","UTF-8") + "=" + URLEncoder.encode(year, "UTF-8")); /*연*/
+            urlBuilder.append("&" + URLEncoder.encode("solMonth","UTF-8") + "=" + URLEncoder.encode(month, "UTF-8")); /*월*/
+
+        } catch (IOException e){
+            e.printStackTrace();
+        }
 
         LinearLayoutManager layoutManager=new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
         recyclerView.setLayoutManager(layoutManager);
@@ -55,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
     }
     public void xmlparsing(){
         try{
-            URL url=new URL(rssUrl);
+            URL url=new URL(urlBuilder.toString());
 
             XMLTask task=new XMLTask();
             task.execute(url);
