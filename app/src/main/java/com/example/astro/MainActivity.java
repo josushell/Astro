@@ -58,20 +58,6 @@ public class MainActivity extends AppCompatActivity {
 
         LinearLayoutManager layoutManager=new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
         recyclerView.setLayoutManager(layoutManager);
-
-        //xmlparsing();
-        //adapter.notifyDataSetChanged();
-
-
-        Button button=findViewById(R.id.button);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                xmlparsing();
-            }
-        });
-
-
     }
 
     @Override
@@ -138,35 +124,24 @@ public class MainActivity extends AppCompatActivity {
                                 parser.next();
                                 if(item!=null){
                                     item.setAstroEvent(parser.getText());
-                                    System.out.println(parser.getText());
-
                                 }
                             }
                             else if(tagname.equals("astroTime")){
                                 parser.next();
                                 if(item!=null){
                                     item.setAstroTime(parser.getText());
-                                    if(parser.getText()!=null){
-                                        System.out.println(parser.getText());
-                                    }
                                 }
                             }
                             else if(tagname.equals("astroTitle")){
                                 parser.next();
                                 if(item!=null){
                                     item.setAstroTitle(parser.getText());
-                                    if(parser.getText()!=null){
-                                        System.out.println(parser.getText().toString());
-                                    }
                                 }
                             }
                             else if(tagname.equals("locdate")){
                                 parser.next();
                                 if(item!=null){
                                     item.setLocdate(parser.getText());
-                                    if(parser.getText()!=null){
-                                        System.out.println(parser.getText().toString());
-                                    }
                                 }
                             }
                             else if(tagname.equals("seq")){

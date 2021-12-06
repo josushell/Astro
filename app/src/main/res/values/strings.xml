@@ -4,4 +4,6 @@
     <string name="astroTime">time</string>
     <string name="astroLocdate">locDate</string>
     <string name="astroEvent">event</string>
+
+    <string name="splashTitle">ASTRO🪐</string>
 </resources>
