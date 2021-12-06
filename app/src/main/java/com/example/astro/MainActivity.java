@@ -8,7 +8,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -49,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
         String day=formattedDate[2];
 
         try{
-            urlBuilder.append("?" + URLEncoder.encode("ServiceKey","UTF-8") + "=Syu%2BtqGals35ZDKELPRhuQ0knXp0t%2FUZlA%2FBUGs3GvEfWohCs%2F0pzrHpjN%2B5WOS41N7bbVuPb7o6Xw1wsl%2B%2FPw%3D%3D");
+            urlBuilder.append("?" + URLEncoder.encode("ServiceKey","UTF-8") + "=");
             urlBuilder.append("&" + URLEncoder.encode("solYear","UTF-8") + "=" + URLEncoder.encode(year, "UTF-8")); /*연*/
             urlBuilder.append("&" + URLEncoder.encode("solMonth","UTF-8") + "=" + URLEncoder.encode(month, "UTF-8")); /*월*/
 
