@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">ASTRO</string>
+    <string name="astroTitle">title</string>
+    <string name="astroTime">time</string>
+    <string name="astroLocdate">locDate</string>
+    <string name="astroEvent">event</string>
 </resources>

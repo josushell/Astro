@@ -73,6 +73,13 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+
+    @Override
+    protected void onStart() {
+        xmlparsing();
+        super.onStart();
+    }
+
     public void xmlparsing(){
         try{
             URL url=new URL(urlBuilder.toString());
@@ -130,25 +137,36 @@ public class MainActivity extends AppCompatActivity {
                             else if(tagname.equals("astroEvent")){
                                 parser.next();
                                 if(item!=null){
-                                    item.setAstroTitle(parser.getText());
+                                    item.setAstroEvent(parser.getText());
+                                    System.out.println(parser.getText());
+
                                 }
                             }
                             else if(tagname.equals("astroTime")){
                                 parser.next();
                                 if(item!=null){
                                     item.setAstroTime(parser.getText());
+                                    if(parser.getText()!=null){
+                                        System.out.println(parser.getText());
+                                    }
                                 }
                             }
                             else if(tagname.equals("astroTitle")){
                                 parser.next();
                                 if(item!=null){
-                                    item.setAstroTime(parser.getText());
+                                    item.setAstroTitle(parser.getText());
+                                    if(parser.getText()!=null){
+                                        System.out.println(parser.getText().toString());
+                                    }
                                 }
                             }
                             else if(tagname.equals("locdate")){
                                 parser.next();
                                 if(item!=null){
-                                    item.setAstroTime(parser.getText());
+                                    item.setLocdate(parser.getText());
+                                    if(parser.getText()!=null){
+                                        System.out.println(parser.getText().toString());
+                                    }
                                 }
                             }
                             else if(tagname.equals("seq")){

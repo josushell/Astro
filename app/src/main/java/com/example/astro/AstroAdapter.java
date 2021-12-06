@@ -1,6 +1,7 @@
 package com.example.astro;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -68,6 +69,19 @@ public class AstroAdapter extends RecyclerView.Adapter<AstroAdapter.aa> {
             textView4=itemView.findViewById(R.id.textevent);
         }
         public void setItem(AstroItem item) {
+            if(item.getAstroTitle()!=null){
+                Log.d("parsing",item.getAstroTitle());
+            }
+            if(item.getAstroTime()!=null){
+                Log.d("parsing",item.getAstroTime());
+            }
+            if(item.getAstroEvent()!=null){
+                Log.d("parsing",item.getAstroEvent());
+            }
+            if(item.getLocdate()!=null){
+                Log.d("parsing",item.getLocdate());
+            }
+
             if(item.getAstroTitle()==null){
                 textView1.setText(item.getAstroEvent());
                 textView4.setText("");
