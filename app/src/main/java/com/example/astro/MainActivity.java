@@ -5,6 +5,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.DatePickerDialog;
+import android.app.SearchManager;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -44,6 +46,16 @@ public class MainActivity extends AppCompatActivity {
         TextView mainDate=findViewById(R.id.mainDate);
         recyclerView=findViewById(R.id.recycler);
         adapter=new AstroAdapter(items,this);
+        // 메인 액티비티에서 커스텀 리스너 객체 생성해서 처리
+        adapter.setOnAstroClickListener(new AstroAdapter.onAstroClickListener() {
+            @Override
+            public void onItemClick(View v) {
+                TextView query=v.findViewById(R.id.textTitle);
+                Intent intent=new Intent(Intent.ACTION_WEB_SEARCH);
+                intent.putExtra(SearchManager.QUERY,query.getText().toString());
+                startActivity(intent);
+            }
+        });
         recyclerView.setAdapter(adapter);
         urlBuilder = new StringBuilder(ASTROURL);
         originalLenth=urlBuilder.length();
@@ -55,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
         String year=formattedDate[0];
         String month=formattedDate[1];
         String day=formattedDate[2];
-        mainDate.setText(month+"월 🔭");
+        mainDate.setText(String.format("%s년 %s월 🔭",year,month));
 
         ImageButton pastButton=findViewById(R.id.pastbtn);
         pastButton.setOnClickListener(new View.OnClickListener() {
@@ -66,19 +78,14 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // url 설정
-        makeUrlBuilder(year,month,false);
+        makeUrlBuilder(year,month);
 
         LinearLayoutManager layoutManager=new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
         recyclerView.setLayoutManager(layoutManager);
     }
-    public void makeUrlBuilder(String year, String month,boolean again){
+    public void makeUrlBuilder(String year, String month){
         Log.d("parsinglog","makeurlbuilder 실행됨");
         try{
-            if(again){
-                Log.d("parsinglog","again");
-                urlBuilder.setLength(0);
-                urlBuilder.append(ASTROURL);
-            }
             urlBuilder.append("?" + URLEncoder.encode("ServiceKey","UTF-8") + "="+APIKEY);
             urlBuilder.append("&" + URLEncoder.encode("solYear","UTF-8") + "=" + URLEncoder.encode(year, "UTF-8")); // 연도
             urlBuilder.append("&" + URLEncoder.encode("solMonth","UTF-8") + "=" + URLEncoder.encode(month, "UTF-8")); // 월
@@ -99,13 +106,20 @@ public class MainActivity extends AppCompatActivity {
             public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
                 String year=Integer.toString(i);
                 String month=Integer.toString(i1+1);
+
+                TextView mainDate=findViewById(R.id.mainDate);
+                mainDate.setText(String.format("%s년 %s월 🔭",year,month));
+
                 Log.d("parsinglog",year+" / "+month);
-                makeUrlBuilder(year,month,true);
+                urlBuilder.setLength(0);
+                urlBuilder.append(ASTROURL);
+                makeUrlBuilder(year,month);
                 xmlparsing();
-                //adapter.notifyDataSetChanged();
+                adapter.notifyDataSetChanged();
             }
         },year,month,day).show();
     }
+
 
     @Override
     protected void onStart() {
