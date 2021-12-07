@@ -4,10 +4,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.DatePickerDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
-import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -20,11 +24,14 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
     StringBuilder urlBuilder;
-
+    private static final String ASTROURL="http://apis.data.go.kr/B090041/openapi/service/AstroEventInfoService/getAstroEventInfo";
+    private static final String APIKEY="";
+    private static int originalLenth;
     RecyclerView recyclerView;
     AstroAdapter adapter;
     ArrayList<AstroItem> items=new ArrayList<>();
@@ -34,10 +41,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        TextView mainDate=findViewById(R.id.mainDate);
         recyclerView=findViewById(R.id.recycler);
         adapter=new AstroAdapter(items,this);
         recyclerView.setAdapter(adapter);
-        urlBuilder = new StringBuilder("http://apis.data.go.kr/B090041/openapi/service/AstroEventInfoService/getAstroEventInfo");
+        urlBuilder = new StringBuilder(ASTROURL);
+        originalLenth=urlBuilder.length();
 
         Date thisMonth=new Date();
         SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy/MM//DD");
@@ -46,18 +55,56 @@ public class MainActivity extends AppCompatActivity {
         String year=formattedDate[0];
         String month=formattedDate[1];
         String day=formattedDate[2];
+        mainDate.setText(month+"월 🔭");
 
+        ImageButton pastButton=findViewById(R.id.pastbtn);
+        pastButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getAnotherDate();
+            }
+        });
+
+        // url 설정
+        makeUrlBuilder(year,month,false);
+
+        LinearLayoutManager layoutManager=new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
+        recyclerView.setLayoutManager(layoutManager);
+    }
+    public void makeUrlBuilder(String year, String month,boolean again){
+        Log.d("parsinglog","makeurlbuilder 실행됨");
         try{
-            urlBuilder.append("?" + URLEncoder.encode("ServiceKey","UTF-8") + "=");
-            urlBuilder.append("&" + URLEncoder.encode("solYear","UTF-8") + "=" + URLEncoder.encode(year, "UTF-8")); /*연*/
-            urlBuilder.append("&" + URLEncoder.encode("solMonth","UTF-8") + "=" + URLEncoder.encode(month, "UTF-8")); /*월*/
+            if(again){
+                Log.d("parsinglog","again");
+                urlBuilder.setLength(0);
+                urlBuilder.append(ASTROURL);
+            }
+            urlBuilder.append("?" + URLEncoder.encode("ServiceKey","UTF-8") + "="+APIKEY);
+            urlBuilder.append("&" + URLEncoder.encode("solYear","UTF-8") + "=" + URLEncoder.encode(year, "UTF-8")); // 연도
+            urlBuilder.append("&" + URLEncoder.encode("solMonth","UTF-8") + "=" + URLEncoder.encode(month, "UTF-8")); // 월
+            Log.d("parsinglog","url: "+urlBuilder.toString());
 
         } catch (IOException e){
             e.printStackTrace();
         }
+    }
+    public void getAnotherDate(){
+        Calendar calendar=Calendar.getInstance();
+        int year=calendar.get(Calendar.YEAR);
+        int month=calendar.get(Calendar.MONTH);
+        int day=calendar.get(Calendar.DAY_OF_MONTH);
 
-        LinearLayoutManager layoutManager=new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
-        recyclerView.setLayoutManager(layoutManager);
+        new DatePickerDialog(MainActivity.this, new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
+                String year=Integer.toString(i);
+                String month=Integer.toString(i1+1);
+                Log.d("parsinglog",year+" / "+month);
+                makeUrlBuilder(year,month,true);
+                xmlparsing();
+                //adapter.notifyDataSetChanged();
+            }
+        },year,month,day).show();
     }
 
     @Override
@@ -67,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void xmlparsing(){
+        Log.d("parsinglog","xml parsing");
         try{
             URL url=new URL(urlBuilder.toString());
 
@@ -88,6 +136,7 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             System.out.println(s);
+            cancel(true);
         }
 
         @Override
@@ -100,6 +149,7 @@ public class MainActivity extends AppCompatActivity {
         protected String doInBackground(URL... urls) {
             URL myurl=urls[0];
             try{
+                items.clear();
                 InputStream is= myurl.openStream();
                 XmlPullParserFactory factory=XmlPullParserFactory.newInstance();
                 XmlPullParser parser=factory.newPullParser();
@@ -124,6 +174,8 @@ public class MainActivity extends AppCompatActivity {
                                 parser.next();
                                 if(item!=null){
                                     item.setAstroEvent(parser.getText());
+                                    if(parser.getText()!=null)
+                                        System.out.println(parser.getText());
                                 }
                             }
                             else if(tagname.equals("astroTime")){
@@ -142,6 +194,8 @@ public class MainActivity extends AppCompatActivity {
                                 parser.next();
                                 if(item!=null){
                                     item.setLocdate(parser.getText());
+                                    if(parser.getText()!=null)
+                                        System.out.println(parser.getText());
                                 }
                             }
                             else if(tagname.equals("seq")){
