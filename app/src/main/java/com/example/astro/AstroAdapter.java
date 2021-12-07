@@ -1,24 +1,39 @@
 package com.example.astro;
 
+import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 
 public class AstroAdapter extends RecyclerView.Adapter<AstroAdapter.aa> {
+    private static onAstroClickListener astroClickListener=null;
+    // 커스텀 리스너 등록해서 mainActivity에서 처리
+    public interface onAstroClickListener{
+        void onItemClick(View v);
+    }
+    public void setOnAstroClickListener(onAstroClickListener listener){
+        this.astroClickListener=listener;
+    }
+
     ArrayList<AstroItem> items=new ArrayList<>();
     Context context;
 
     public AstroAdapter(ArrayList<AstroItem> items, Context context) {
         this.items = items;
         this.context=context;
+
     }
 
     @NonNull
@@ -54,6 +69,7 @@ public class AstroAdapter extends RecyclerView.Adapter<AstroAdapter.aa> {
     public void setItem(int position, AstroItem item) {
         items.set(position, item);
     }
+
     static class aa extends RecyclerView.ViewHolder{
         private TextView textView1;
         private TextView textView2;
@@ -62,6 +78,14 @@ public class AstroAdapter extends RecyclerView.Adapter<AstroAdapter.aa> {
 
         public aa(@NonNull View itemView) {
             super(itemView);
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if(astroClickListener!=null){
+                        astroClickListener.onItemClick(view);
+                    }
+                }
+            });
 
             textView1=itemView.findViewById(R.id.textTitle);
             textView2=itemView.findViewById(R.id.textLocdate);
