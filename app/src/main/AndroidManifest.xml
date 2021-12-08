@@ -13,10 +13,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ASTRO"
         android:usesCleartextTraffic="true">
+        <service
+            android:name=".AstroAlarmService"
+            android:enabled="true"
+            android:exported="true"></service>
+
         <receiver
             android:name=".AlarmReceiver"
             android:enabled="true"
-            android:exported="true"></receiver>
+            android:exported="true" />
 
         <activity
             android:name=".SplashActivity"

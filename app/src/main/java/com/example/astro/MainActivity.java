@@ -4,7 +4,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.AlarmManager;
 import android.app.DatePickerDialog;
+import android.app.PendingIntent;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -24,18 +26,20 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
-    StringBuilder urlBuilder;
+    private StringBuilder urlBuilder;
     private static final String ASTROURL="http://apis.data.go.kr/B090041/openapi/service/AstroEventInfoService/getAstroEventInfo";
     private static final String APIKEY="";
-    RecyclerView recyclerView;
-    AstroAdapter adapter;
-    ArrayList<AstroItem> items=new ArrayList<>();
+    private RecyclerView recyclerView;
+    private AstroAdapter adapter;
+    private ArrayList<AstroItem> items=new ArrayList<>();
+    private AlarmManager alarmManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +60,9 @@ public class MainActivity extends AppCompatActivity {
 
         // xml parsing 용 Url builder
         urlBuilder = new StringBuilder(ASTROURL);
+
+        // alarm manager
+        alarmManager=(AlarmManager) getSystemService(ALARM_SERVICE);
 
         // recyclerview 레이아웃 처리하고 item click listener
         recyclerView=findViewById(R.id.recycler);
@@ -100,6 +107,27 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e){
             e.printStackTrace();
         }
+    }
+    private void setAlarm(){
+        Intent alarmIntent=new Intent(MainActivity.this,AlarmReceiver.class);
+        PendingIntent pendingIntent=PendingIntent.getBroadcast
+                (MainActivity.this,0,alarmIntent,PendingIntent.FLAG_IMMUTABLE);
+
+        String form="2021-12-09 02:08:30";
+
+        SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date TargetTime=null;
+        try{
+            TargetTime=dateFormat.parse(form);
+        }catch (ParseException e){
+            e.printStackTrace();
+        }
+
+        Calendar calendar=Calendar.getInstance();
+        calendar.setTime(TargetTime);
+
+        Log.d("testloging","setAlarm()");
+        alarmManager.set(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),pendingIntent);
     }
     public void getAnotherDate(){
         Calendar calendar=Calendar.getInstance();
@@ -154,6 +182,7 @@ public class MainActivity extends AppCompatActivity {
         // 파라미터는 doInBackground 의 return 값임
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
+            setAlarm();
             System.out.println(s);
             cancel(true);
         }

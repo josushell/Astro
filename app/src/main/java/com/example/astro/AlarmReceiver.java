@@ -21,25 +21,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        AlarmManager alarmManager=(AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        builder=null;
-        notimgr=(NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.O){
-            // API 26 이상에서의 channel 지정
-            notimgr.createNotificationChannel(
-                    new NotificationChannel(channel_id,channel_name,NotificationManager.IMPORTANCE_DEFAULT));
-            builder=new NotificationCompat.Builder(context,channel_id);
-        }
-        else{
-            // under 26
-            builder=new NotificationCompat.Builder(context);
-        }
-
-        Intent newIntent=new Intent(context,MainActivity.class);
-        PendingIntent pendingIntent=PendingIntent.getActivity(context,101,newIntent,
-                PendingIntent.FLAG_IMMUTABLE|PendingIntent.FLAG_UPDATE_CURRENT);
-
-        Notification noti= builder.build();
-        notimgr.notify(1,noti);
+        context.startService(intent);
     }
+
 }
