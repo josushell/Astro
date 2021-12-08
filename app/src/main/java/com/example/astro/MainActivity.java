@@ -33,7 +33,6 @@ public class MainActivity extends AppCompatActivity {
     StringBuilder urlBuilder;
     private static final String ASTROURL="http://apis.data.go.kr/B090041/openapi/service/AstroEventInfoService/getAstroEventInfo";
     private static final String APIKEY="";
-    private static int originalLenth;
     RecyclerView recyclerView;
     AstroAdapter adapter;
     ArrayList<AstroItem> items=new ArrayList<>();
@@ -43,7 +42,22 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // textview
         TextView mainDate=findViewById(R.id.mainDate);
+
+        // choose another date button
+        ImageButton pastButton=findViewById(R.id.pastbtn);
+        pastButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getAnotherDate();
+            }
+        });
+
+        // xml parsing 용 Url builder
+        urlBuilder = new StringBuilder(ASTROURL);
+
+        // recyclerview 레이아웃 처리하고 item click listener
         recyclerView=findViewById(R.id.recycler);
         adapter=new AstroAdapter(items,this);
         // 메인 액티비티에서 커스텀 리스너 객체 생성해서 처리
@@ -57,8 +71,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         recyclerView.setAdapter(adapter);
-        urlBuilder = new StringBuilder(ASTROURL);
-        originalLenth=urlBuilder.length();
+
 
         Date thisMonth=new Date();
         SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy/MM//DD");
@@ -66,19 +79,12 @@ public class MainActivity extends AppCompatActivity {
         String[] formattedDate=date.split("/");
         String year=formattedDate[0];
         String month=formattedDate[1];
-        String day=formattedDate[2];
         mainDate.setText(String.format("%s년 %s월 🔭",year,month));
 
-        ImageButton pastButton=findViewById(R.id.pastbtn);
-        pastButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                getAnotherDate();
-            }
-        });
 
         // url 설정
         makeUrlBuilder(year,month);
+        xmlparsing();
 
         LinearLayoutManager layoutManager=new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
         recyclerView.setLayoutManager(layoutManager);
@@ -123,7 +129,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onStart() {
-        xmlparsing();
         super.onStart();
     }
 
