@@ -22,6 +22,7 @@ public class AstroAdapter extends RecyclerView.Adapter<AstroAdapter.aa> {
     // 커스텀 리스너 등록해서 mainActivity에서 처리
     public interface onAstroClickListener{
         void onItemClick(View v);
+        void onLongClick(View v);
     }
     public void setOnAstroClickListener(onAstroClickListener listener){
         this.astroClickListener=listener;
@@ -84,6 +85,15 @@ public class AstroAdapter extends RecyclerView.Adapter<AstroAdapter.aa> {
                     if(astroClickListener!=null){
                         astroClickListener.onItemClick(view);
                     }
+                }
+            });
+            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    if(astroClickListener!=null)
+                        astroClickListener.onLongClick(view);
+
+                    return true;
                 }
             });
 

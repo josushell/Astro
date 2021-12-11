@@ -5,9 +5,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.PendingIntent;
 import android.app.SearchManager;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -16,7 +18,9 @@ import android.view.View;
 import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import org.w3c.dom.Text;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
@@ -69,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
         adapter=new AstroAdapter(items,this);
         // 메인 액티비티에서 커스텀 리스너 객체 생성해서 처리
         adapter.setOnAstroClickListener(new AstroAdapter.onAstroClickListener() {
+            // 그냥 클릭 -> 웹 검색으로 이어짐
             @Override
             public void onItemClick(View v) {
                 TextView query=v.findViewById(R.id.textTitle);
@@ -76,10 +81,17 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtra(SearchManager.QUERY,query.getText().toString());
                 startActivity(intent);
             }
+
+            // 길게 클릭 -> 알림 설정으로 이어짐
+            @Override
+            public void onLongClick(View v) {
+                setDialog(v);
+            }
         });
         recyclerView.setAdapter(adapter);
 
 
+        // main xml 날짜 설정
         Date thisMonth=new Date();
         SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy/MM//DD");
         String date=dateFormat.format(thisMonth);
@@ -96,6 +108,31 @@ public class MainActivity extends AppCompatActivity {
         LinearLayoutManager layoutManager=new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
         recyclerView.setLayoutManager(layoutManager);
     }
+
+    // item을 길게 클릭시 반응하는 이벤트
+    private void setDialog(View v){
+        TextView textView=v.findViewById(R.id.textTitle);
+        String event=textView.getText().toString();
+
+        AlertDialog.Builder builder=new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle("[ "+event+" ] 에 대한 \n알림을 설정할까요?");
+        builder.setPositiveButton("ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                setAlarm(v);
+                Toast.makeText(MainActivity.this, "설정 완료!", Toast.LENGTH_SHORT).show();
+            }
+        });
+        builder.setNegativeButton("no", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        });
+
+        AlertDialog alertDialog= builder.create();
+        alertDialog.show();
+    }
     public void makeUrlBuilder(String year, String month){
         Log.d("parsinglog","makeurlbuilder 실행됨");
         try{
@@ -108,17 +145,20 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-    private void setAlarm(){
+    private void setAlarm(View item){
         Intent alarmIntent=new Intent(MainActivity.this,AlarmReceiver.class);
         PendingIntent pendingIntent=PendingIntent.getBroadcast
                 (MainActivity.this,0,alarmIntent,PendingIntent.FLAG_IMMUTABLE);
 
-        String form="2021-12-09 02:08:30";
+        TextView dayText=item.findViewById(R.id.textLocdate);
+        String day=dayText.getText().toString();
+        String time="00:05:00"; // 이벤트가 있는 날 0시 5분에 알람을 보냄
 
         SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date TargetTime=null;
         try{
-            TargetTime=dateFormat.parse(form);
+            TargetTime=dateFormat.parse(day+time);
+            Log.d("alarmtest",TargetTime.toString());
         }catch (ParseException e){
             e.printStackTrace();
         }
@@ -126,9 +166,11 @@ public class MainActivity extends AppCompatActivity {
         Calendar calendar=Calendar.getInstance();
         calendar.setTime(TargetTime);
 
-        Log.d("testloging","setAlarm()");
-        alarmManager.set(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),pendingIntent);
+        Log.d("alarmtest","setAlarm()");
+        alarmManager.set(AlarmManager.RTC,calendar.getTimeInMillis(),pendingIntent);
     }
+
+    // 날짜를 바꿀 경우 다시 날짜를 선택하고 xml parsing
     public void getAnotherDate(){
         Calendar calendar=Calendar.getInstance();
         int year=calendar.get(Calendar.YEAR);
@@ -182,7 +224,6 @@ public class MainActivity extends AppCompatActivity {
         // 파라미터는 doInBackground 의 return 값임
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            setAlarm();
             System.out.println(s);
             cancel(true);
         }

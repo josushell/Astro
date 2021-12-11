@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/back_gradient"
     tools:context=".SplashActivity">
 
     <TextView
@@ -11,6 +12,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="monospace"
+        android:textStyle="bold|italic"
+        android:textColor="@color/white"
         android:text="@string/splashTitle"
         android:textSize="40sp"
         app:layout_constraintBottom_toBottomOf="parent"
