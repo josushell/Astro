@@ -65,9 +65,6 @@ public class MainActivity extends AppCompatActivity {
         // xml parsing 용 Url builder
         urlBuilder = new StringBuilder(ASTROURL);
 
-        // alarm manager
-        alarmManager=(AlarmManager) getSystemService(ALARM_SERVICE);
-
         // recyclerview 레이아웃 처리하고 item click listener
         recyclerView=findViewById(R.id.recycler);
         adapter=new AstroAdapter(items,this);
@@ -147,18 +144,27 @@ public class MainActivity extends AppCompatActivity {
     }
     private void setAlarm(View item){
         Intent alarmIntent=new Intent(MainActivity.this,AlarmReceiver.class);
+        alarmIntent.setAction("com.example.astro.ALARM_RECEIVER");
+
+        TextView title=item.findViewById(R.id.textTitle);
+        TextView loctime=item.findViewById(R.id.textTime);
+        TextView dayText=item.findViewById(R.id.textLocdate);
+
+        String content=String.format("오늘 %s에 이벤트가 있어요",loctime.getText().toString());
+        String time=dayText.getText().toString()+" 00:05:00"; // 이벤트가 있는 날 0시 5분에 알람을 보냄
+
+        alarmIntent.putExtra("title",title.getText().toString());
+        alarmIntent.putExtra("content",content);
         PendingIntent pendingIntent=PendingIntent.getBroadcast
                 (MainActivity.this,0,alarmIntent,PendingIntent.FLAG_IMMUTABLE);
 
-        TextView dayText=item.findViewById(R.id.textLocdate);
-        String day=dayText.getText().toString();
-        String time="00:05:00"; // 이벤트가 있는 날 0시 5분에 알람을 보냄
+        // alarm manager 설정
+        alarmManager=(AlarmManager) getSystemService(ALARM_SERVICE);
 
         SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date TargetTime=null;
         try{
-            TargetTime=dateFormat.parse(day+time);
-            Log.d("alarmtest",TargetTime.toString());
+            TargetTime=dateFormat.parse(time);
         }catch (ParseException e){
             e.printStackTrace();
         }
@@ -263,8 +269,6 @@ public class MainActivity extends AppCompatActivity {
                                 parser.next();
                                 if(item!=null){
                                     item.setAstroEvent(parser.getText());
-                                    if(parser.getText()!=null)
-                                        System.out.println(parser.getText());
                                 }
                             }
                             else if(tagname.equals("astroTime")){
@@ -283,8 +287,6 @@ public class MainActivity extends AppCompatActivity {
                                 parser.next();
                                 if(item!=null){
                                     item.setLocdate(parser.getText());
-                                    if(parser.getText()!=null)
-                                        System.out.println(parser.getText());
                                 }
                             }
                             else if(tagname.equals("seq")){

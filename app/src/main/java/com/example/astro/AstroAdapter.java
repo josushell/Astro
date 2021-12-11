@@ -112,7 +112,7 @@ public class AstroAdapter extends RecyclerView.Adapter<AstroAdapter.aa> {
                 textView4.setText(item.getAstroEvent());
             }
             String s=item.getLocdate();
-            String result=String.format("%s/%s/%s",s.substring(0,4),s.substring(4,6),s.substring(6,8));
+            String result=String.format("%s-%s-%s",s.substring(0,4),s.substring(4,6),s.substring(6,8));
             textView2.setText(result);
             textView3.setText(item.getAstroTime());
         }

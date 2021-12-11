@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
+import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 
@@ -19,8 +20,12 @@ public class AstroAlarmService extends Service {
     NotificationManager notimgr;
     NotificationCompat.Builder builder;
 
+    private String title;
+    private String content;
+
     @Override
     public void onCreate() {
+        Log.d("alarmtest","AstroAlarmService onCreate()");
         AlarmManager alarmManager=(AlarmManager) getSystemService(Context.ALARM_SERVICE);
         builder=null;
         notimgr=(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -31,6 +36,11 @@ public class AstroAlarmService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.d("alarmtest","AstroAlarmService onStartCommand()");
+
+        title=intent.getStringExtra("title")+"  🪐";
+        content=intent.getStringExtra("content")+"  🔭";
+
         if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.O){
             // API 26 이상에서의 channel 지정
             notimgr.createNotificationChannel(
@@ -54,11 +64,12 @@ public class AstroAlarmService extends Service {
     }
 
     private void buildMSG(PendingIntent pendingIntent, Intent intent){
-        String notiTitle=intent.getStringExtra("title")+"  🪐";
-        String noticontent=intent.getStringExtra("content")+"  🔭";
+        Log.d("alarmtest","AstroAlarmService buildMSG()");
 
-        builder.setContentTitle(notiTitle);
-        builder.setContentText(noticontent);
+        builder.setContentTitle(title);
+        builder.setContentText(content);
+        builder.setSmallIcon(R.drawable.ic_launcher_background);
+        builder.setSmallIcon(R.drawable.ic_launcher_foreground);
         builder.setContentIntent(pendingIntent);
         builder.setAutoCancel(true);
     }

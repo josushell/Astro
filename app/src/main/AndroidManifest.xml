@@ -16,7 +16,11 @@
         <service
             android:name=".AstroAlarmService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.example.astro.ALARM_RECEIVER"/>
+            </intent-filter>
+        </service>
 
         <receiver
             android:name=".AlarmReceiver"
