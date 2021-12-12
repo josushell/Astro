@@ -25,7 +25,6 @@ public class AstroAlarmService extends Service {
 
     @Override
     public void onCreate() {
-        Log.d("alarmtest","AstroAlarmService onCreate()");
         AlarmManager alarmManager=(AlarmManager) getSystemService(Context.ALARM_SERVICE);
         builder=null;
         notimgr=(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -60,12 +59,13 @@ public class AstroAlarmService extends Service {
 
         Notification noti= builder.build();
         notimgr.notify(1,noti);
+
+        stopSelf();
         return super.onStartCommand(intent, flags, startId);
+
     }
 
     private void buildMSG(PendingIntent pendingIntent, Intent intent){
-        Log.d("alarmtest","AstroAlarmService buildMSG()");
-
         builder.setContentTitle(title);
         builder.setContentText(content);
         builder.setSmallIcon(R.drawable.ic_launcher_background);
@@ -73,6 +73,13 @@ public class AstroAlarmService extends Service {
         builder.setContentIntent(pendingIntent);
         builder.setAutoCancel(true);
     }
+
+    @Override
+    public void onDestroy() {
+        Log.d("alarmtest","AstroAlarmService onDestroy()");
+        super.onDestroy();
+    }
+
     @Override
     public IBinder onBind(Intent intent) {
         return null;

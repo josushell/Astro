@@ -111,24 +111,34 @@ public class MainActivity extends AppCompatActivity {
         TextView textView=v.findViewById(R.id.textTitle);
         String event=textView.getText().toString();
 
-        AlertDialog.Builder builder=new AlertDialog.Builder(MainActivity.this);
-        builder.setTitle("[ "+event+" ] 에 대한 \n알림을 설정할까요?");
-        builder.setPositiveButton("ok", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                setAlarm(v);
-                Toast.makeText(MainActivity.this, "설정 완료!", Toast.LENGTH_SHORT).show();
-            }
-        });
-        builder.setNegativeButton("no", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
+        TextView firstItem=v.findViewById(R.id.textevent);
+        String isFirstItem=firstItem.getText().toString();
 
-            }
-        });
+        if(isFirstItem.length()<2){
+            AlertDialog.Builder builder=new AlertDialog.Builder(MainActivity.this);
+            builder.setTitle("[ "+event+" ] 에 대한 \n알림을 설정할까요?");
+            builder.setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
 
-        AlertDialog alertDialog= builder.create();
-        alertDialog.show();
+                    setAlarm(v);
+                    Toast.makeText(MainActivity.this, "설정 완료!", Toast.LENGTH_SHORT).show();
+                }
+            });
+            builder.setNegativeButton("no", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+
+                }
+            });
+
+            AlertDialog alertDialog= builder.create();
+            alertDialog.show();
+        }
+        else{
+            // main event는 알림 설정 제한
+        }
+
     }
     public void makeUrlBuilder(String year, String month){
         Log.d("parsinglog","makeurlbuilder 실행됨");
@@ -150,13 +160,14 @@ public class MainActivity extends AppCompatActivity {
         TextView loctime=item.findViewById(R.id.textTime);
         TextView dayText=item.findViewById(R.id.textLocdate);
 
+
         String content=String.format("오늘 %s에 이벤트가 있어요",loctime.getText().toString());
         String time=dayText.getText().toString()+" 00:05:00"; // 이벤트가 있는 날 0시 5분에 알람을 보냄
 
         alarmIntent.putExtra("title",title.getText().toString());
         alarmIntent.putExtra("content",content);
         PendingIntent pendingIntent=PendingIntent.getBroadcast
-                (MainActivity.this,0,alarmIntent,PendingIntent.FLAG_IMMUTABLE);
+                (MainActivity.this,0,alarmIntent,PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_MUTABLE);
 
         // alarm manager 설정
         alarmManager=(AlarmManager) getSystemService(ALARM_SERVICE);
