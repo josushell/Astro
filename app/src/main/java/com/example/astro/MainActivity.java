@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
 
 
-        // main xml 날짜 설정
+        // main xml 위에 보이는 날짜 설정
         Date thisMonth=new Date();
         SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy/MM//DD");
         String date=dateFormat.format(thisMonth);
